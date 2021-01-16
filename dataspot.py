@@ -88,16 +88,13 @@ def user_followed_csv(followed=True, top=True, restval=None):
         print('Check keyword arguments for user_followed_csv')
     max_followed_genres = max([artist_dict['total_genres']
                                for artist_dict in simple_user_artists])
-    field_names = ['name', 'id', 'uri', 'followers', 'popularity', 'total_genres']
+    field_names = ['name', 'followers', 'popularity', 'total_genres']
     for i in range(max_followed_genres):
         field_names += ['genre_' + str(i)]
-    print(field_names)
-    with open('data/user_followed.csv', 'w') as output:
+    field_names += ['id', 'uri']
+    with open('data/user_artists.csv', 'w') as output:
         writer = csv.DictWriter(output, fieldnames=field_names, restval=restval)
         writer.writeheader()
         for artist_dict in simple_user_artists:
-            pprint.pprint(artist_dict)
             writer.writerow(artist_dict)
-
-
 
