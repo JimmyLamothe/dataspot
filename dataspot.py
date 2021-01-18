@@ -3,16 +3,20 @@
 To be refactored into different modules as it grows.
 """
 
+import os
 import csv
 import pprint
 import spotipy
-
-from user_methods import get_user_top, get_user_followed, simplify_followed_artist
+from spotify_methods import get_user_albums
+from user_methods import get_user_artists
 from utilities import combine_unique
 
-def user_followed_csv(followed=True, top=True, restval=None):
-    """ Exports top and followed artist data to CSV format | lst(dict) --> None
+def user_artists_csv(followed=True, top=True, force=False, restval=None):
+    """ Exports top and followed artist data to CSV format | None --> None
     
+    Set force to True if you want to recreate the CSV file even if it already
+    exists, otherwise the function will return immediately.
+
     Set top or followed to False if you only want one or the other. Setting both
     to False will fail.
 
@@ -20,24 +24,15 @@ def user_followed_csv(followed=True, top=True, restval=None):
     any followed or top artist. Artists with fewer genres will have a default
     value=restval for missing genre columns.
 
-    Saves to 'user_followed.csv' in relative directory 'data'    
+    Saves to 'user_artists.csv' in relative directory 'data'    
     """
-    if followed:
-        user_followed = get_user_followed()
-        simple_user_followed = list(map(simplify_followed_artist, user_followed))
-    else:
-        user_followed = []
-    if top:
-        user_top = get_user_top()
-        simple_user_top = list(map(simplify_followed_artist, user_top))
-    else:
-        user_top = []
-    simple_user_artists = combine_unique(simple_user_followed, simple_user_top)
-    if not simple_user_artists:
-        print('No followed or top artists found.')
-        print('Check keyword arguments for user_followed_csv')
+    if not force:
+        if os.path.exists('data/user_artists.csv'):
+            print('CSV file exists, use force=True to recreate it if needed')
+            return
+    user_artists = get_user_artists(followed=followed, top=top)
     max_followed_genres = max([artist_dict['total_genres']
-                               for artist_dict in simple_user_artists])
+                               for artist_dict in user_artists])
     field_names = ['name', 'followers', 'popularity', 'total_genres']
     for i in range(max_followed_genres):
         field_names += ['genre_' + str(i)]
@@ -45,6 +40,20 @@ def user_followed_csv(followed=True, top=True, restval=None):
     with open('data/user_artists.csv', 'w') as output:
         writer = csv.DictWriter(output, fieldnames=field_names, restval=restval)
         writer.writeheader()
-        for artist_dict in simple_user_artists:
+        for artist_dict in user_artists:
             writer.writerow(artist_dict)
 
+def user_albums_csv(force=False, restval=None):
+    """ Exports user album information to CSV format | None --> None
+    
+    Set force to True if you want to recreate the CSV file even if it already
+    exists, otherwise the function will return immediately.
+    """
+    
+    if not force:
+        if os.path.exists('data/user_artists.csv'):
+            print('CSV file exists, use force=True to recreate it if needed')
+            return
+    user_artists = get_user_artists()
+    user_albums = get_user_albums(user_artists)
+    return user_albums

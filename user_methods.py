@@ -1,13 +1,13 @@
-""" Functions that interact with the Spotify API using authorization
+""" Functions that interact with the Spotify API using authorizationA
 for a specific user. Separate module because user functions use
 a different authorization flow than the general functions """
 
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from auth import set_environment
-from utilities import combine_unique
+from utilities import combine_unique, simplify_artist
 
-# Duplicated in spotify_methods - possibly not necessary? Check 
+# Duplicated in spotify_methods - possibly not necessary?
 set_environment('environment.json')
 
 # Generate the Spotify API client
@@ -35,25 +35,19 @@ def get_user_followed():
             finished = True
     return results
 
-def simplify_followed_artist(followed_artist_dict, max_genres=20):
-    """ Formats and simplifies the Spotify API artist information | dict --> dict
-    Returns a dictionary with the following keys and value types:
-    'name':str
-    'id':str
-    'uri':str
-    'followers':int
-    'popularity':int
-    'total_genres':int
-    'genre_x':str #MULTIPLE GENRE KEYS POSSIBLE
-    """
-    total_genres = min(max_genres, len(followed_artist_dict['genres']))
-    simple_dict = {}
-    simple_dict['name'] = followed_artist_dict['name']
-    simple_dict['id'] = followed_artist_dict['id']
-    simple_dict['uri'] = followed_artist_dict['uri']
-    simple_dict['followers'] = followed_artist_dict['followers']['total']
-    simple_dict['popularity'] = followed_artist_dict['popularity']
-    simple_dict['total_genres'] = total_genres
-    for i in range(total_genres):
-        simple_dict['genre_' + str(i)] = followed_artist_dict['genres'][i]
-    return simple_dict
+def get_user_artists(followed=True, top=True):
+    if followed:
+        user_followed = get_user_followed()
+        simple_user_followed = list(map(simplify_artist, user_followed))
+    else:
+        user_followed = []
+    if top:
+        user_top = get_user_top()
+        simple_user_top = list(map(simplify_artist, user_top))
+    else:
+        user_top = []
+    simple_user_artists = combine_unique(simple_user_followed, simple_user_top)
+    if not simple_user_artists:
+        print('No followed or top artists found.')
+        print('Make sure you did not set both kwargs to False')
+    return simple_user_artists
