@@ -43,9 +43,8 @@ def get_user_albums(user_artists, max_artists=10):
     for artist in popular_artists:
         artist_id = artist['id']
         artist_name = artist['name']
-        artist_popularity = artist['popularity']
-        print(artist_name, artist_popularity)
         artist_albums = get_artist_albums(artist_id)
-        simple_albums = list(map(simplify_album, artist_albums))
+        simple_albums = list(map(lambda a:simplify_album(a, artist_name=artist_name),
+                                 artist_albums))
         user_albums.extend(simple_albums)
     return user_albums

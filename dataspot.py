@@ -8,7 +8,7 @@ import csv
 import pprint
 import spotipy
 from spotify_methods import get_user_albums
-from user_methods import get_user_artists
+from user_methods import get_user_artists, get_user_tracks
 from utilities import combine_unique
 
 def user_artists_csv(followed=True, top=True, force=False, restval=None):
@@ -42,18 +42,46 @@ def user_artists_csv(followed=True, top=True, force=False, restval=None):
         writer.writeheader()
         for artist_dict in user_artists:
             writer.writerow(artist_dict)
-
+    #return user_artists #Uncomment for development
+            
 def user_albums_csv(force=False, restval=None):
-    """ Exports user album information to CSV format | None --> None
+    """ Exports user's artists' album information to CSV format | None --> None
     
     Set force to True if you want to recreate the CSV file even if it already
     exists, otherwise the function will return immediately.
     """
-    
     if not force:
-        if os.path.exists('data/user_artists.csv'):
+        if os.path.exists('data/user_albums.csv'):
             print('CSV file exists, use force=True to recreate it if needed')
             return
     user_artists = get_user_artists()
     user_albums = get_user_albums(user_artists)
-    return user_albums
+    with open('data/user_albums.csv', 'w') as output:
+        field_names = ['name', 'artist_name', 'release_date',
+                       'total_tracks', 'type', 'id', 'uri']
+        writer = csv.DictWriter(output, fieldnames=field_names, restval=restval)
+        writer.writeheader()
+        for album_dict in user_albums:
+            writer.writerow(album_dict)
+    #return user_albums #Uncomment for development
+
+def user_tracks_csv(force=False, restval=None):
+    """ Exports user's top and saved tracks to CSV format | None --> None
+    
+    Set force to True if you want to recreate the CSV file even if it already
+    exists, otherwise the function will return immediately.
+    """
+    if not force:
+        if os.path.exists('data/user_tracks.csv'):
+            print('CSV file exists, use force=True to recreate it if needed')
+            return
+    user_tracks = get_user_tracks()
+    with open('data/user_tracks.csv', 'w') as output:
+        field_names = ['name', 'artist_name', 'release_date', 'duration', 'track_number',
+                       'popularity', 'album_name', 'explicit', 'id', 'uri']
+        writer = csv.DictWriter(output, fieldnames=field_names, restval=restval)
+        writer.writeheader()
+        for track_dict in user_tracks:
+            print(track_dict)
+            writer.writerow(track_dict)
+    return user_tracks #Uncomment for development
