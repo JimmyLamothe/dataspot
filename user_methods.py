@@ -78,8 +78,11 @@ def get_user_saved_tracks():
     append_track(results)
     return saved_tracks
 
-def get_user_tracks(saved=True, top=True):
-    """ Get user's top and saved tracks | None --> dict """
+def get_user_tracks(saved=False, top=True):
+    """ Get user's top and/or saved tracks | None --> dict 
+    
+    NOTE: By default, only gets the top tracks, not saved.
+    """
     if saved:
         user_saved = get_user_saved_tracks()
         simple_saved = list(map(simplify_track, user_saved))

@@ -77,11 +77,11 @@ def user_tracks_csv(force=False, restval=None):
             return
     user_tracks = get_user_tracks()
     with open('data/user_tracks.csv', 'w') as output:
-        field_names = ['name', 'artist_name', 'release_date', 'duration', 'track_number',
-                       'popularity', 'album_name', 'explicit', 'id', 'uri']
+        field_names = ['name', 'artist_name', 'release_date', 'duration',
+                       'popularity', 'track_number', 'total_tracks', 'album_name',
+                       'album_type', 'explicit', 'id', 'uri']
         writer = csv.DictWriter(output, fieldnames=field_names, restval=restval)
         writer.writeheader()
         for track_dict in user_tracks:
-            print(track_dict)
             writer.writerow(track_dict)
-    return user_tracks #Uncomment for development
+    #return user_tracks #Uncomment for development

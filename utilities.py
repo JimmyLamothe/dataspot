@@ -86,11 +86,13 @@ def simplify_track(track_dict, artist_name=None):
         artist_name = track_dict['artists'][0]['name']
     simple_dict['artist_name'] = artist_name
     simple_dict['album_name'] = track_dict['album']['name']
+    simple_dict['album_type'] = track_dict['album']['album_type']
+    simple_dict['total_tracks'] = track_dict['album']['total_tracks']
     simple_dict['id'] = track_dict['id']
     simple_dict['uri'] = track_dict['uri']
     simple_dict['release_date'] = track_dict['album']['release_date']
     simple_dict['track_number'] = track_dict['track_number']
-    simple_dict['duration'] = track_dict['duration_ms']
+    simple_dict['duration'] = int(track_dict['duration_ms']/1000)
     simple_dict['popularity'] = track_dict['popularity']
     simple_dict['explicit'] = track_dict['explicit']
     return simple_dict
